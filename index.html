@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remix — Shaurya Chauhan</title>
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --text-primary: #f5f5f5;
+            --text-secondary: #a3a3a3;
+            --accent: #ffffff;
+            --border: #2e2e2e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .player-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .player-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .now-playing {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--accent);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-action:hover {
+            opacity: 0.9;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--border);
+            border-radius: 3px;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .progress-bar::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Extra Settings (Volume & Speed) */
+        .settings-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .setting-group label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .setting-group select, .setting-group input[type="range"] {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .setting-group select {
+            width: 100%;
+        }
+
+        .tracklist {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .tracklist-header {
+            padding: 16px 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-primary);
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        li span {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Remix</h1>
+            <p class="subtitle">Curated by Shaurya Chauhan</p>
+        </header>
+
+        <section class="player-card">
+            <div class="player-top">
+                <span class="now-playing">Audio Player</span>
+                <div class="controls-row">
+                    <button class="btn-action" id="skipBwd" onclick="skipTime(-5)">-5s</button>
+                    <button class="btn-action" id="playBtn" onclick="togglePlay()">Play</button>
+                    <button class="btn-action" id="skipFwd" onclick="skipTime(5)">+5s</button>
+                </div>
+            </div>
+
+            <!-- Track Progress -->
+            <div class="progress-container">
+                <input type="range" id="progressBar" class="progress-bar" value="0" min="0" max="100" step="0.1" onchange="seekAudio(this.value)">
+                <div class="time-info">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+
+            <!-- Volume & Speed Controls -->
+            <div class="settings-row">
+                <div class="setting-group">
+                    <label for="volumeSlider">Volume</label>
+                    <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1" oninput="changeVolume(this.value)">
+                </div>
+                <div class="setting-group">
+                    <label for="speedSelect">Speed</label>
+                    <select id="speedSelect" onchange="changeSpeed(this.value)">
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1.0x (Normal)</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2.0x</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Audio element pointing to song.mp3 in the same folder -->
+            <audio id="audioPlayer" src="song.mp3"></audio>
+        </section>
+
+        <section class="tracklist">
+            <div class="tracklist-header">Featured Tracks</div>
+            <ul>
+                <li>GOAT <span>01</span></li>
+                <li>SAME BEEF <span>02</span></li>
+                <li>THESE DAYS <span>03</span></li>
+                <li>JAAT DONT CARE <span>04</span></li>
+                <li>AAOGE TUM KABHI <span>05</span></li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Shaurya Chauhan. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                playBtn.textContent = 'Pause';
+            } else {
+                audio.pause();
+                playBtn.textContent = 'Play';
+            }
+        }
+
+        function skipTime(seconds) {
+            audio.currentTime += seconds;
+        }
+
+        function changeVolume(value) {
+            audio.volume = value;
+        }
+
+        function changeSpeed(value) {
+            audio.playbackRate = value;
+        }
+
+        function seekAudio(value) {
+            const time = (value / 100) * audio.duration;
+            audio.currentTime = time;
+        }
+
+        audio.addEventListener('loadedmetadata', () => {
+            durationEl.textContent = formatTime(audio.duration);
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            if (!isNaN(audio.duration)) {
+                const progressPercent = (audio.currentTime / audio.duration) * 100;
+                progressBar.value = progressPercent;
+                currentTimeEl.textContent = formatTime(audio.currentTime);
+            }
+        });
+
+        audio.addEventListener('ended', () => {
+            playBtn.textContent = 'Play';
+            progressBar.value = 0;
+            audio.currentTime = 0;
+        });
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+    </script>
+
+</body>
+</html>
